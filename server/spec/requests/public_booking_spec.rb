@@ -68,9 +68,71 @@ RSpec.describe "Public booking", type: :request do
         startsAt: slot_time.iso8601,
       }
 
-      expect(response).to have_http_status(:unprocessable_content)
+      expect(response).to have_http_status(:conflict)
       expect(json["message"]).to match(/no longer available/i)
       expect(Appointment.count).to eq(1)
+    end
+
+    it "returns 409 when the database unique index catches a racing insert" do
+      allow_any_instance_of(Appointment).to receive(:save).and_raise(ActiveRecord::RecordNotUnique)
+
+      post "/api/public/businesses/glow-salon/appointments", params: {
+        serviceId: service.id, customerName: "Jane Doe", customerEmail: "jane@example.com",
+        startsAt: slot_time.iso8601,
+      }
+
+      expect(response).to have_http_status(:conflict)
+    end
+
+    it "enforces uniqueness of confirmed slots at the database level" do
+      create(:appointment, business: business, service: service, starts_at: slot_time, ends_at: slot_time + 30.minutes)
+      dup = build(:appointment, business: business, service: service, starts_at: slot_time, ends_at: slot_time + 30.minutes)
+
+      expect { dup.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+
+    {
+      "outside business hours" => 14,
+      "before opening" => 7,
+    }.each do |label, hour|
+      it "rejects a booking #{label}" do
+        post "/api/public/businesses/glow-salon/appointments", params: {
+          serviceId: service.id, customerName: "Jane", customerEmail: "jane@example.com",
+          startsAt: monday.in_time_zone.change(hour: hour).iso8601,
+        }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Appointment.count).to eq(0)
+      end
+    end
+
+    it "rejects a start time that is off the slot grid" do
+      post "/api/public/businesses/glow-salon/appointments", params: {
+        serviceId: service.id, customerName: "Jane", customerEmail: "jane@example.com",
+        startsAt: monday.in_time_zone.change(hour: 9, min: 10).iso8601,
+      }
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it "rejects a start time in the past" do
+      post "/api/public/businesses/glow-salon/appointments", params: {
+        serviceId: service.id, customerName: "Jane", customerEmail: "jane@example.com",
+        startsAt: (monday - 7).in_time_zone.change(hour: 9).iso8601,
+      }
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it "rejects a booking that would run past closing time" do
+      long = create(:service, business: business, name: "Long", duration_minutes: 90, active: true)
+
+      post "/api/public/businesses/glow-salon/appointments", params: {
+        serviceId: long.id, customerName: "Jane", customerEmail: "jane@example.com",
+        startsAt: monday.in_time_zone.change(hour: 11).iso8601,
+      }
+
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "no longer offers a slot as available once it is booked" do
