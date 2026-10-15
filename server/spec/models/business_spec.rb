@@ -5,6 +5,12 @@ RSpec.describe Business, type: :model do
     expect(build(:business)).to be_valid
   end
 
+  it "defaults the timezone to UTC and rejects unknown zones" do
+    expect(build(:business).timezone).to eq("UTC")
+    expect(build(:business, timezone: "America/New_York")).to be_valid
+    expect(build(:business, timezone: "Mars/Olympus")).not_to be_valid
+  end
+
   it "requires a unique slug" do
     create(:business, slug: "acme-inc")
     duplicate = build(:business, slug: "acme-inc")

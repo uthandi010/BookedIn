@@ -7,6 +7,7 @@ module Api
         render json: {
           name: business.name,
           slug: business.slug,
+          timezone: business.timezone,
           services: business.services.active.map { |s|
             {
               id: s.id,

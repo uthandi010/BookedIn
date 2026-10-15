@@ -77,6 +77,18 @@ RSpec.describe AvailabilityCalculator do
     end
   end
 
+  context "when the business is in a non-UTC timezone" do
+    let(:business) { create(:business, timezone: "America/New_York") }
+
+    before { create(:business_hour, business: business, day_of_week: 1, start_minute: 9 * 60, end_minute: 10 * 60) }
+
+    it "computes slots in the business's local time" do
+      slots = call
+      expect(slots.map { |t| t.in_time_zone("America/New_York").strftime("%H:%M") }).to eq(["09:00"])
+      expect(slots.first).to eq(ActiveSupport::TimeZone["America/New_York"].local(monday.year, monday.month, monday.day, 9))
+    end
+  end
+
   context "when the service is longer than the entire open window" do
     before { create(:business_hour, business: business, day_of_week: 1, start_minute: 9 * 60, end_minute: 9 * 60 + 30) }
     let(:service) { create(:service, business: business, duration_minutes: 90) }

@@ -17,6 +17,7 @@ module Api
 
     def create
       business = Business.new(name: params[:name], slug: params[:slug], owner: current_user)
+      business.timezone = params[:timezone] if params[:timezone].present?
 
       ActiveRecord::Base.transaction do
         business.save!
@@ -35,6 +36,7 @@ module Api
         id: business.id,
         name: business.name,
         slug: business.slug,
+        timezone: business.timezone,
         myRole: role.to_s.capitalize,
         memberCount: business.business_members.size,
         serviceCount: business.services.size,
