@@ -32,7 +32,7 @@ module Api
               id: appointment.id,
               startsAt: appointment.starts_at.iso8601,
               endsAt: appointment.ends_at.iso8601,
-              serviceName: service.name,
+              serviceName: service.name
             }, status: :created
           else
             render json: { message: appointment.errors.full_messages.to_sentence }, status: :unprocessable_content

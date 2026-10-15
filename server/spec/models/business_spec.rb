@@ -18,7 +18,7 @@ RSpec.describe Business, type: :model do
   end
 
   it "rejects slugs with spaces or underscores" do
-    ["acme_inc", "acme inc"].each do |bad_slug|
+    [ "acme_inc", "acme inc" ].each do |bad_slug|
       expect(build(:business, slug: bad_slug)).not_to be_valid
     end
   end

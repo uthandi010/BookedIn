@@ -8,6 +8,6 @@ class CreateBusinessHours < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :business_hours, [:business_id, :day_of_week], unique: true
+    add_index :business_hours, [ :business_id, :day_of_week ], unique: true
   end
 end

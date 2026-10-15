@@ -14,9 +14,9 @@ module Api
               name: s.name,
               durationMinutes: s.duration_minutes,
               priceCents: s.price_cents,
-              description: s.description,
+              description: s.description
             }
-          },
+          }
         }
       end
     end

@@ -52,7 +52,7 @@ module Api
         duration_minutes: params[:durationMinutes],
         price_cents: params[:priceCents],
         description: params[:description],
-        active: params[:active],
+        active: params[:active]
       }.compact
     end
 
@@ -63,7 +63,7 @@ module Api
         durationMinutes: service.duration_minutes,
         priceCents: service.price_cents,
         description: service.description,
-        active: service.active,
+        active: service.active
       }
     end
   end

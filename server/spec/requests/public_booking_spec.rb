@@ -50,7 +50,7 @@ RSpec.describe "Public booking", type: :request do
     it "books an available slot" do
       post "/api/public/businesses/glow-salon/appointments", params: {
         serviceId: service.id, customerName: "Jane Doe", customerEmail: "jane@example.com",
-        startsAt: slot_time.iso8601,
+        startsAt: slot_time.iso8601
       }
 
       expect(response).to have_http_status(:created)
@@ -60,12 +60,12 @@ RSpec.describe "Public booking", type: :request do
     it "rejects booking the same slot twice (no double-booking)" do
       post "/api/public/businesses/glow-salon/appointments", params: {
         serviceId: service.id, customerName: "Jane Doe", customerEmail: "jane@example.com",
-        startsAt: slot_time.iso8601,
+        startsAt: slot_time.iso8601
       }
 
       post "/api/public/businesses/glow-salon/appointments", params: {
         serviceId: service.id, customerName: "Someone Else", customerEmail: "else@example.com",
-        startsAt: slot_time.iso8601,
+        startsAt: slot_time.iso8601
       }
 
       expect(response).to have_http_status(:conflict)
@@ -78,7 +78,7 @@ RSpec.describe "Public booking", type: :request do
 
       post "/api/public/businesses/glow-salon/appointments", params: {
         serviceId: service.id, customerName: "Jane Doe", customerEmail: "jane@example.com",
-        startsAt: slot_time.iso8601,
+        startsAt: slot_time.iso8601
       }
 
       expect(response).to have_http_status(:conflict)
@@ -93,12 +93,12 @@ RSpec.describe "Public booking", type: :request do
 
     {
       "outside business hours" => 14,
-      "before opening" => 7,
+      "before opening" => 7
     }.each do |label, hour|
       it "rejects a booking #{label}" do
         post "/api/public/businesses/glow-salon/appointments", params: {
           serviceId: service.id, customerName: "Jane", customerEmail: "jane@example.com",
-          startsAt: monday.in_time_zone.change(hour: hour).iso8601,
+          startsAt: monday.in_time_zone.change(hour: hour).iso8601
         }
 
         expect(response).to have_http_status(:unprocessable_content)
@@ -109,7 +109,7 @@ RSpec.describe "Public booking", type: :request do
     it "rejects a start time that is off the slot grid" do
       post "/api/public/businesses/glow-salon/appointments", params: {
         serviceId: service.id, customerName: "Jane", customerEmail: "jane@example.com",
-        startsAt: monday.in_time_zone.change(hour: 9, min: 10).iso8601,
+        startsAt: monday.in_time_zone.change(hour: 9, min: 10).iso8601
       }
 
       expect(response).to have_http_status(:unprocessable_content)
@@ -118,7 +118,7 @@ RSpec.describe "Public booking", type: :request do
     it "rejects a start time in the past" do
       post "/api/public/businesses/glow-salon/appointments", params: {
         serviceId: service.id, customerName: "Jane", customerEmail: "jane@example.com",
-        startsAt: (monday - 7).in_time_zone.change(hour: 9).iso8601,
+        startsAt: (monday - 7).in_time_zone.change(hour: 9).iso8601
       }
 
       expect(response).to have_http_status(:unprocessable_content)
@@ -129,7 +129,7 @@ RSpec.describe "Public booking", type: :request do
 
       post "/api/public/businesses/glow-salon/appointments", params: {
         serviceId: long.id, customerName: "Jane", customerEmail: "jane@example.com",
-        startsAt: monday.in_time_zone.change(hour: 11).iso8601,
+        startsAt: monday.in_time_zone.change(hour: 11).iso8601
       }
 
       expect(response).to have_http_status(:unprocessable_content)
@@ -138,7 +138,7 @@ RSpec.describe "Public booking", type: :request do
     it "no longer offers a slot as available once it is booked" do
       post "/api/public/businesses/glow-salon/appointments", params: {
         serviceId: service.id, customerName: "Jane Doe", customerEmail: "jane@example.com",
-        startsAt: slot_time.iso8601,
+        startsAt: slot_time.iso8601
       }
 
       get "/api/public/businesses/glow-salon/availability", params: { serviceId: service.id, date: monday.iso8601 }

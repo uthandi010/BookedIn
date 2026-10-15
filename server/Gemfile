@@ -13,6 +13,9 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"
 
+# Throttling for public booking and auth endpoints
+gem "rack-attack"
+
 # Password hashing for has_secure_password
 gem "bcrypt", "~> 3.1.7"
 
@@ -24,4 +27,9 @@ group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem "rspec-rails", "~> 7.1"
   gem "factory_bot_rails"
+
+  # Static analysis / audit
+  gem "brakeman", require: false
+  gem "bundler-audit", require: false
+  gem "rubocop-rails-omakase", require: false
 end

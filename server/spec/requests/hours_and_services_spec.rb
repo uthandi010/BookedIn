@@ -13,21 +13,21 @@ RSpec.describe "Business hours and service deletion", type: :request do
     end
 
     it "replaces the week with valid entries" do
-      put_hours(hours: [{ dayOfWeek: 1, startLabel: "09:00", endLabel: "17:00" }])
+      put_hours(hours: [ { dayOfWeek: 1, startLabel: "09:00", endLabel: "17:00" } ])
 
       expect(response).to have_http_status(:ok)
       expect(json.first).to include("dayOfWeek" => 1, "startLabel" => "09:00", "endLabel" => "17:00")
     end
 
     [
-      ["a non-array hours value", { hours: "nope" }],
-      ["an object instead of an array", { hours: { "a" => 1 } }],
-      ["a missing hours key", {}],
-      ["non-object entries", { hours: ["x", 3] }],
-      ["a garbage time label", { hours: [{ dayOfWeek: 1, startLabel: "abc", endLabel: "17:00" }] }],
-      ["an out-of-range time label", { hours: [{ dayOfWeek: 1, startLabel: "09:00", endLabel: "25:99" }] }],
-      ["a missing time label", { hours: [{ dayOfWeek: 1, endLabel: "17:00" }] }],
-      ["a garbage day of week", { hours: [{ dayOfWeek: "abc", startLabel: "09:00", endLabel: "17:00" }] }],
+      [ "a non-array hours value", { hours: "nope" } ],
+      [ "an object instead of an array", { hours: { "a" => 1 } } ],
+      [ "a missing hours key", {} ],
+      [ "non-object entries", { hours: [ "x", 3 ] } ],
+      [ "a garbage time label", { hours: [ { dayOfWeek: 1, startLabel: "abc", endLabel: "17:00" } ] } ],
+      [ "an out-of-range time label", { hours: [ { dayOfWeek: 1, startLabel: "09:00", endLabel: "25:99" } ] } ],
+      [ "a missing time label", { hours: [ { dayOfWeek: 1, endLabel: "17:00" } ] } ],
+      [ "a garbage day of week", { hours: [ { dayOfWeek: "abc", startLabel: "09:00", endLabel: "17:00" } ] } ]
     ].each do |label, body|
       it "returns 422 for #{label}" do
         create(:business_hour, business: business, day_of_week: 2)
