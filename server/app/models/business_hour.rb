@@ -22,8 +22,18 @@ class BusinessHour < ApplicationRecord
     format("%02d:%02d", minutes / 60, minutes % 60)
   end
 
+  LABEL_FORMAT = /\A(\d{1,2}):(\d{2})\z/
+
+  # Returns nil for anything that isn't a valid "HH:MM" label (00:00-24:00),
+  # so the model's numericality validation reports it instead of raising.
   def self.label_to_minutes(label)
-    hours, mins = label.to_s.split(":").map(&:to_i)
+    match = LABEL_FORMAT.match(label.to_s.strip)
+    return nil if match.nil?
+
+    hours = match[1].to_i
+    mins = match[2].to_i
+    return nil if mins > 59 || hours > 24 || (hours == 24 && mins.positive?)
+
     (hours * 60) + mins
   end
 
