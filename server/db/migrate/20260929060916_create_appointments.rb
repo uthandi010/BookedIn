@@ -12,7 +12,7 @@ class CreateAppointments < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :appointments, [:business_id, :starts_at]
+    add_index :appointments, [ :business_id, :starts_at ]
     add_index :appointments, :staff_user_id
   end
 end

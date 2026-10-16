@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_060916) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_15_000002) do
   create_table "appointments", force: :cascade do |t|
     t.integer "business_id", null: false
     t.integer "service_id", null: false
@@ -22,6 +22,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_060916) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_id", "starts_at"], name: "index_appointments_on_business_and_start_when_confirmed", unique: true, where: "status = 0"
     t.index ["business_id", "starts_at"], name: "index_appointments_on_business_id_and_starts_at"
     t.index ["business_id"], name: "index_appointments_on_business_id"
     t.index ["service_id"], name: "index_appointments_on_service_id"
@@ -56,6 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_060916) do
     t.integer "owner_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "timezone", default: "UTC", null: false
     t.index ["owner_id"], name: "index_businesses_on_owner_id"
     t.index ["slug"], name: "index_businesses_on_slug", unique: true
   end

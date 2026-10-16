@@ -54,7 +54,7 @@ class AvailabilityCalculator
   end
 
   def day_start
-    @day_start ||= @date.in_time_zone.beginning_of_day
+    @day_start ||= @business.time_zone.local(@date.year, @date.month, @date.day)
   end
 
   def day_end

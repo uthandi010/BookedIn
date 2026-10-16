@@ -14,8 +14,19 @@ class Business < ApplicationRecord
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true, format: { with: SLUG_FORMAT,
     message: "can only contain lowercase letters, numbers, and single hyphens" }
+  validate :timezone_is_known
+
+  def time_zone
+    ActiveSupport::TimeZone[timezone.to_s] || ActiveSupport::TimeZone["UTC"]
+  end
 
   def role_for(user)
     business_members.find_by(user_id: user.id)&.role
+  end
+
+  private
+
+  def timezone_is_known
+    errors.add(:timezone, "is not a valid time zone") if ActiveSupport::TimeZone[timezone.to_s].nil?
   end
 end

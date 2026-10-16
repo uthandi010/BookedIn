@@ -18,7 +18,7 @@ module Api
         customerEmail: appointment.customer_email,
         startsAt: appointment.starts_at.iso8601,
         endsAt: appointment.ends_at.iso8601,
-        status: appointment.status.capitalize,
+        status: appointment.status.capitalize
       }
     end
   end

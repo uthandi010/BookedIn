@@ -33,6 +33,18 @@ jobs:
         working-directory: server
         run: bundle exec rspec
 
+      - name: Lint (RuboCop)
+        working-directory: server
+        run: bundle exec rubocop
+
+      - name: Security scan (Brakeman)
+        working-directory: server
+        run: bundle exec brakeman --quiet --no-pager --exit-on-warn --exit-on-error
+
+      - name: Gem audit
+        working-directory: server
+        run: bundle exec bundler-audit check --update
+
   client:
     runs-on: ubuntu-latest
 

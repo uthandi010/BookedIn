@@ -31,11 +31,13 @@ module Api
     def destroy
       require_owner!
       service = @business.services.find(params[:id])
-      service.destroy
-      head :no_content
-    rescue ActiveRecord::RecordNotDestroyed
-      render json: { message: "Can't delete a service that already has appointments booked." },
-             status: :unprocessable_content
+
+      if service.destroy
+        head :no_content
+      else
+        render json: { message: "Can't delete a service that already has appointments booked." },
+               status: :unprocessable_content
+      end
     end
 
     private
@@ -50,7 +52,7 @@ module Api
         duration_minutes: params[:durationMinutes],
         price_cents: params[:priceCents],
         description: params[:description],
-        active: params[:active],
+        active: params[:active]
       }.compact
     end
 
@@ -61,7 +63,7 @@ module Api
         durationMinutes: service.duration_minutes,
         priceCents: service.price_cents,
         description: service.description,
-        active: service.active,
+        active: service.active
       }
     end
   end

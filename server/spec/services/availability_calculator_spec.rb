@@ -33,7 +33,7 @@ RSpec.describe AvailabilityCalculator do
       # 09:00, 09:30, 10:00, 10:30, 11:00 all leave room for a 60-minute
       # service before the 12:00 close. 11:30 would run until 12:30, so it
       # must not appear.
-      expect(labels).to eq(["09:00", "09:30", "10:00", "10:30", "11:00"])
+      expect(labels).to eq([ "09:00", "09:30", "10:00", "10:30", "11:00" ])
     end
 
     it "excludes a slot that overlaps an existing confirmed appointment" do
@@ -74,6 +74,18 @@ RSpec.describe AvailabilityCalculator do
       expect(call(staff_user_id: staff_a.id).map { |t| t.strftime("%H:%M") }).not_to include("10:00")
       # ...but staff B has no appointments, so their calendar is untouched.
       expect(call(staff_user_id: staff_b.id).map { |t| t.strftime("%H:%M") }).to include("10:00")
+    end
+  end
+
+  context "when the business is in a non-UTC timezone" do
+    let(:business) { create(:business, timezone: "America/New_York") }
+
+    before { create(:business_hour, business: business, day_of_week: 1, start_minute: 9 * 60, end_minute: 10 * 60) }
+
+    it "computes slots in the business's local time" do
+      slots = call
+      expect(slots.map { |t| t.in_time_zone("America/New_York").strftime("%H:%M") }).to eq([ "09:00" ])
+      expect(slots.first).to eq(ActiveSupport::TimeZone["America/New_York"].local(monday.year, monday.month, monday.day, 9))
     end
   end
 

@@ -3,7 +3,7 @@ module Api
     before_action :authenticate_user!
 
     def index
-      memberships = current_user.business_memberships.includes(business: [:business_members, :services])
+      memberships = current_user.business_memberships.includes(business: [ :business_members, :services ])
       render json: memberships.map { |m| business_summary(m.business, m.role) }
     end
 
@@ -17,6 +17,7 @@ module Api
 
     def create
       business = Business.new(name: params[:name], slug: params[:slug], owner: current_user)
+      business.timezone = params[:timezone] if params[:timezone].present?
 
       ActiveRecord::Base.transaction do
         business.save!
@@ -35,9 +36,10 @@ module Api
         id: business.id,
         name: business.name,
         slug: business.slug,
+        timezone: business.timezone,
         myRole: role.to_s.capitalize,
         memberCount: business.business_members.size,
-        serviceCount: business.services.size,
+        serviceCount: business.services.size
       }
     end
   end

@@ -11,13 +11,18 @@ module Api
     # simply closed that day (no BusinessHour row for it).
     def update
       require_owner!
-      entries = Array(params[:hours])
+      entries = params[:hours]
+
+      unless entries.is_a?(Array) && entries.all? { |e| e.is_a?(ActionController::Parameters) }
+        return render json: { message: "hours must be an array of { dayOfWeek, startLabel, endLabel } objects." },
+                      status: :unprocessable_content
+      end
 
       ActiveRecord::Base.transaction do
         @business.business_hours.delete_all
         entries.each do |entry|
           @business.business_hours.create!(
-            day_of_week: entry[:dayOfWeek],
+            day_of_week: Integer(entry[:dayOfWeek].to_s, 10, exception: false),
             start_minute: BusinessHour.label_to_minutes(entry[:startLabel]),
             end_minute: BusinessHour.label_to_minutes(entry[:endLabel])
           )
